@@ -4,27 +4,36 @@ import mediapipe as mp
 
 def main():
     cap = cv.VideoCapture(0)
-    manos = mp.solutions.hands.Hands()
-    dibujo = mp.solutions.drawing_utils
-    estilos = mp.solutions.drawing_styles
 
-    while True:
-        exito, img = cap.read()
-        imgRGB = cv.cvtColor(img, cv.COLOR_BGR2RGB)
-        resultado = manos.process(imgRGB)
+    mp_hands = mp.solutions.hands
+    mp_drawing = mp.solutions.drawing_utils
+    mp_drawing_styles = mp.solutions.drawing_styles
 
-        land_marks = resultado.multi_hand_landmarks
+    with mp_hands.Hands() as hands:
+        while cap.isOpened():
+            success, img = cap.read()
+            if not success:
+                print('ignoring')
+                break
 
-        if land_marks:
-            for land_mark in land_marks:
-                dibujo.draw_land_marks(resultado,
-                                       land_marks,
-                                       manos.HAND_CONNECTIONS,
-                                       estilos.get_default_hand_landmarks_style(),
-                                       estilos.get_default_hand_connections_style())
+            img.flags.writeable = False
+            img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+            results = hands.process(img)
 
-        cv.imshow('video', img)
-        cv.waitKey(1)
+            img.flags.writeable = True
+            img = cv.cvtColor(img, cv.COLOR_RGB2BGR)
+
+            if results.multi_hand_landmarks:
+                for hand_landmarks in results.multi_hand_landmarks:
+                    mp_drawing.draw_landmarks(
+                        img,
+                        hand_landmarks,
+                        mp_hands.HAND_CONNECTIONS,
+                        mp_drawing_styles.get_default_hand_landmarks_style(),
+                        mp_drawing_styles.get_default_hand_connections_style())
+
+            cv.imshow('video', img)
+            cv.waitKey(5)
 
 
 if __name__ == '__main__':
