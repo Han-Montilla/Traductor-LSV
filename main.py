@@ -3,12 +3,21 @@ import mediapipe as mp
 
 
 def main():
+    #Leemos la camara
     cap = cv.VideoCapture(0)
 
+    #Ajustamos los parametros para la deteccion
+
+    #creamos un objeto que va a recibir la deteccion
     mp_hands = mp.solutions.hands
+
+    #metodo qye crea los puntos criticos calculados matematicamente en las manos
     mp_drawing = mp.solutions.drawing_utils
+
+    #el estilo que tendran los puntos
     mp_drawing_styles = mp.solutions.drawing_styles
 
+    #Verificamos si la camara funciona y agregamos parametros  
     with mp_hands.Hands() as hands:
         while cap.isOpened():
             success, img = cap.read()
@@ -22,7 +31,8 @@ def main():
 
             img.flags.writeable = True
             img = cv.cvtColor(img, cv.COLOR_RGB2BGR)
-
+            
+            #Si funciona aplicamos parametros y se empieza la camara
             if results.multi_hand_landmarks:
                 for hand_landmarks in results.multi_hand_landmarks:
                     mp_drawing.draw_landmarks(
