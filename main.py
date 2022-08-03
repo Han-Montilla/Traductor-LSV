@@ -11,24 +11,26 @@ from numpy import place
 
 
 def main():
-    #Leemos la camara
+    # Leemos la camara
     cap = cv.VideoCapture(0)
 
-    #Ajustamos los parametros para la deteccion
+    # Ajustamos los parametros para la deteccion
 
-    #creamos un objeto que va a recibir la deteccion
+    # creamos un objeto que va a recibir la deteccion
     mp_hands = mp.solutions.hands
 
-    #metodo que crea los puntos criticos calculados matematicamente en las manos
+    # metodo que crea los puntos criticos calculados matematicamente en las manos
     mp_drawing = mp.solutions.drawing_utils
 
-    #el estilo que tendran los puntos
+    # el estilo que tendran los puntos
     mp_drawing_styles = mp.solutions.drawing_styles
 
-    #Verificamos si la camara funciona con las manos y agregamos parametros  
+    # Verificamos si la camara funciona con las manos y agregamos parametros
     with mp_hands.Hands() as hands:
         while cap.isOpened():
             success, img = cap.read()
+            h, w, c = img.shape
+
             if not success:
                 print('ignoring')
                 break
@@ -39,23 +41,36 @@ def main():
 
             img.flags.writeable = True
             img = cv.cvtColor(img, cv.COLOR_RGB2BGR)
-            
 
+            # Si funciona aplicamos parametros para que se puedan ver en la camara
+            if results.multi_hand_landmarks:
 
-            #Si funciona aplicamos parametros para que se puedan ver en la camara
-            if results.multi_hand_landmarks:               
-                
-                #detecta los puntos en las manos y los dibuja
+                # detecta los puntos en las manos y los dibuja
                 for hand_landmarks in results.multi_hand_landmarks:
+                    x_max = 0
+                    y_max = 0
+                    x_min = w
+                    y_min = h
+
+                    for lm in hand_landmarks.landmark:
+                        x, y = int(lm.x * w), int(lm.y * h)
+                        if x > x_max:
+                            x_max = x
+                        if x < x_min:
+                            x_min = x
+                        if y > y_max:
+                            y_max = y
+                        if y < y_min:
+                            y_min = y
+                    cv.rectangle(img, (x_min, y_min),
+                                 (x_max, y_max), (0, 255, 0), 2)
                     mp_drawing.draw_landmarks(
                         img,
                         hand_landmarks,
                         mp_hands.HAND_CONNECTIONS,
                         mp_drawing_styles.get_default_hand_landmarks_style(),
                         mp_drawing_styles.get_default_hand_connections_style())
-            
 
-            cv.rectangle(img,(100-2,300-2),(100+3,300+3),(0,255,0),6)
             cv.imshow('video', img)
             cv.waitKey(5)
 
