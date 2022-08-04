@@ -47,10 +47,13 @@ def main():
 
                 # detecta los puntos en las manos y los dibuja
                 for hand_landmarks in results.multi_hand_landmarks:
+                    #definimos las variables de posicion del cuadro
                     x_max = 0
                     y_max = 0
                     x_min = w
                     y_min = h
+
+                    #hacemos queel cuadro se adapte a las manos que salgan en la camara 
 
                     for lm in hand_landmarks.landmark:
                         x, y = int(lm.x * w), int(lm.y * h)
@@ -62,8 +65,10 @@ def main():
                             y_max = y
                         if y < y_min:
                             y_min = y
-                    cv.rectangle(img, (x_min, y_min),
-                                 (x_max, y_max), (0, 255, 0), 2)
+
+                        #funcion el cual implementa el cuadro junto a la camara
+                    cv.rectangle(img, (x_min-32, y_min-32),
+                                 (x_max+32, y_max+32), (255, 0, 0), 5)
                     mp_drawing.draw_landmarks(
                         img,
                         hand_landmarks,
