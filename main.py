@@ -1,11 +1,13 @@
-import time
 import cv2
 import numpy as np
 import mediapipe as mp
 import os
 
+# Global Variables
 mp_holistic = mp.solutions.holistic  # Holistic model
 mp_drawing = mp.solutions.drawing_utils  # Drawing utilities
+signs = np.array(['a']) # detectable signs
+
 
 # utilidad
 def mediapipe_detection(image, model):
@@ -64,9 +66,6 @@ def generate_data():
   # Path for exported data, numpy arrays
   DATA_PATH = os.path.join('data') 
 
-  # Actions that we try to detect
-  signs = np.array(['a'])
-
   # Thirty videos worth of data
   no_sequences = 30
 
@@ -121,9 +120,17 @@ def generate_data():
           # Break gracefully
           if cv2.waitKey(10) & 0xFF == ord('q'):
               break
-                    
+            
     cap.release()
     cv2.destroyAllWindows()
+
+
+# Preprocess Data and Create Labels and Features
+from sklearn.model_selection import train_test_split
+from tensorflow.python.keras.utils import to_categorical
+
+def process_signs():
+  label_map = { label: num for num, label in enumerate(signs) }
 
 if __name__ == '__main__':
   generate_data()
