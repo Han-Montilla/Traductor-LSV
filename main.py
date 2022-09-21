@@ -1,84 +1,136 @@
-from turtle import color
-from typing import Any
-import cv2 as cv
-from cv2 import blur
-from cv2 import scaleAdd
-from cv2 import adaptiveThreshold
-from cv2 import CamShift
-from matplotlib.pyplot import gray
+import cv2
+import numpy as np
 import mediapipe as mp
-from numpy import place
+import os
 
+# Global Variables
+mp_holistic = mp.solutions.holistic  # Holistic model
+mp_drawing = mp.solutions.drawing_utils  # Drawing utilities
+signs = np.array(['a']) # detectable signs
+
+
+# utilidad
+def mediapipe_detection(image, model):
+  image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # COLOR CONVERSION BGR 2 RGB
+  image.flags.writeable = False                   # Image is no longer writeable
+  results = model.process(image)                  # Make prediction
+  image.flags.writeable = True                    # Image is now writeable
+  image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)  # COLOR COVERSION RGB 2 BGR
+  return image, results
+
+def draw_styled_landmarks(image, results):
+  # Draw left hand
+  mp_drawing.draw_landmarks(
+    image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS, 
+    mp_drawing.DrawingSpec(color=(121,22,76), thickness=2, circle_radius=4), 
+    mp_drawing.DrawingSpec(color=(121,44,250), thickness=2, circle_radius=2)
+  ) 
+  # Draw right hand
+  mp_drawing.draw_landmarks(
+    image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS, 
+    mp_drawing.DrawingSpec(color=(245,117,66), thickness=2, circle_radius=4), 
+    mp_drawing.DrawingSpec(color=(245,66,230), thickness=2, circle_radius=2)
+  )
+
+def extract_keypoints(results):
+  lh = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten() if results.left_hand_landmarks else np.zeros(21*3)
+  rh = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*3)
+  return np.concatenate([lh, rh])
 
 def main():
-    # Leemos la camara
-    cap = cv.VideoCapture(0)
+  cap = cv2.VideoCapture(0)
+  # Set mediapipe model 
+  with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
+    while cap.isOpened():
+      # Read feed
+      ret, frame = cap.read()
 
-    # Ajustamos los parametros para la deteccion
+      # Make detections
+      image, results = mediapipe_detection(frame, holistic)
+      
+      # Draw landmarks
+      draw_styled_landmarks(mp_drawing, mp_holistic, image, results)
 
-    # creamos un objeto que va a recibir la deteccion
-    mp_hands = mp.solutions.hands
+      # Show to screen
+      cv2.imshow('LSV Traductor', image)
 
-    # metodo que crea los puntos criticos calculados matematicamente en las manos
-    mp_drawing = mp.solutions.drawing_utils
+      # Break gracefully
+      if cv2.waitKey(10) & 0xFF == ord('q'):
+        break
+    cap.release()
+    cv2.destroyAllWindows()
 
-    # el estilo que tendran los puntos
-    mp_drawing_styles = mp.solutions.drawing_styles
+# TODO: separar a otro archivo
+def generate_data():
+  
+  # Path for exported data, numpy arrays
+  DATA_PATH = os.path.join('data') 
 
-    # Verificamos si la camara funciona con las manos y agregamos parametros
-    with mp_hands.Hands() as hands:
-        while cap.isOpened():
-            success, img = cap.read()
-            h, w, c = img.shape
+  # Thirty videos worth of data
+  no_sequences = 30
 
-            if not success:
-                print('ignoring')
-                break
+  # Videos are going to be 30 frames in length
+  sequence_length = 30
+  
+  for sign in signs: 
+    for sequence in range(no_sequences):
+      try: 
+        os.makedirs(os.path.join(DATA_PATH, sign, str(sequence)))
+      except:
+        pass
+  
+  cap = cv2.VideoCapture(0)
+  # Set mediapipe model 
+  with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
+    # Loop through actions
+    for sign in signs:
+      # Loop through sequences aka videos
+      for sequence in range(no_sequences):
+        # Loop through video length aka sequence length
+        for frame_num in range(sequence_length):
+          # Read feed
+          ret, frame = cap.read()
 
-            img.flags.writeable = False
-            img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
-            results = hands.process(img)
+          # Make detections
+          image, results = mediapipe_detection(frame, holistic)
 
-            img.flags.writeable = True
-            img = cv.cvtColor(img, cv.COLOR_RGB2BGR)
+          # Draw landmarks
+          draw_styled_landmarks(image, results)
+          
+          # NEW Apply wait logic
+          if frame_num == 0: 
+            cv2.putText(image, 'STARTING COLLECTION', (120,200), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255, 0), 4, cv2.LINE_AA)
+            cv2.putText(image, 'Collecting frames for {} Video Number {}'.format(sign, sequence), (15,12), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
+            # Show to screen
+            cv2.imshow('OpenCV Feed', image)
+            cv2.waitKey(2000)
+          else: 
+            cv2.putText(image, 'Collecting frames for {} Video Number {}'.format(sign, sequence), (15,12), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
+            # Show to screen
+            cv2.imshow('OpenCV Feed', image)
+          
+          # NEW Export keypoints
+          keypoints = extract_keypoints(results)
+          npy_path = os.path.join(DATA_PATH, sign, str(sequence), str(frame_num))
+          np.save(npy_path, keypoints)
 
-            # Si funciona aplicamos parametros para que se puedan ver en la camara
-            if results.multi_hand_landmarks:
+          # Break gracefully
+          if cv2.waitKey(10) & 0xFF == ord('q'):
+              break
+            
+    cap.release()
+    cv2.destroyAllWindows()
 
-                # detecta los puntos en las manos y los dibuja
-                for hand_landmarks in results.multi_hand_landmarks:
-                    #definimos las variables de posicion del cuadro
-                    x_max = 0
-                    y_max = 0
-                    x_min = w
-                    y_min = h
 
-                    #hacemos queel cuadro se adapte a las manos que salgan en la camara 
+# Preprocess Data and Create Labels and Features
+from sklearn.model_selection import train_test_split
+from tensorflow.python.keras.utils import to_categorical
 
-                    for lm in hand_landmarks.landmark:
-                        x, y = int(lm.x * w), int(lm.y * h)
-                        if x > x_max:
-                            x_max = x
-                        if x < x_min:
-                            x_min = x
-                        if y > y_max:
-                            y_max = y
-                        if y < y_min:
-                            y_min = y
-
-                        #funcion el cual implementa el cuadro junto a la camara
-                    cv.rectangle(img, (x_min-32, y_min-32),
-                                 (x_max+32, y_max+32), (255, 0, 0), 5)
-                    mp_drawing.draw_landmarks(
-                        img,
-                        hand_landmarks,
-                        mp_hands.HAND_CONNECTIONS,
-                        mp_drawing_styles.get_default_hand_landmarks_style(),
-                        mp_drawing_styles.get_default_hand_connections_style())
-
-            cv.imshow('video', img)
-            cv.waitKey(5)
-
+def process_signs():
+  label_map = { label: num for num, label in enumerate(signs) }
 
 if __name__ == '__main__':
-    main()
+  generate_data()
