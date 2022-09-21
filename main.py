@@ -4,10 +4,14 @@ import mediapipe as mp
 import os
 
 # Global Variables
-mp_holistic = mp.solutions.holistic  # Holistic model
-mp_drawing = mp.solutions.drawing_utils  # Drawing utilities
+mp_holistic = mp.solutions.mediapipe.python.solutions.holistic  # Holistic model
+mp_drawing = mp.solutions.mediapipe.python.solutions.drawing_utils  # Drawing utilities
 signs = np.array(['a']) # detectable signs
+sequence_count = 30 # Amound of sequences
+sequence_length = 30 # Frames per sequence
 
+# Paths
+DATA_PATH = os.path.join('data')
 
 # utilidad
 def mediapipe_detection(image, model):
@@ -40,7 +44,7 @@ def extract_keypoints(results):
 def main():
   cap = cv2.VideoCapture(0)
   # Set mediapipe model 
-  with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
+  with mp_holistic.Holistic() as holistic:
     while cap.isOpened():
       # Read feed
       ret, frame = cap.read()
@@ -49,7 +53,7 @@ def main():
       image, results = mediapipe_detection(frame, holistic)
       
       # Draw landmarks
-      draw_styled_landmarks(mp_drawing, mp_holistic, image, results)
+      draw_styled_landmarks(image, results)
 
       # Show to screen
       cv2.imshow('LSV Traductor', image)
@@ -60,20 +64,9 @@ def main():
     cap.release()
     cv2.destroyAllWindows()
 
-# TODO: separar a otro archivo
 def generate_data():
-  
-  # Path for exported data, numpy arrays
-  DATA_PATH = os.path.join('data') 
-
-  # Thirty videos worth of data
-  no_sequences = 30
-
-  # Videos are going to be 30 frames in length
-  sequence_length = 30
-  
   for sign in signs: 
-    for sequence in range(no_sequences):
+    for sequence in range(sequence_count):
       try: 
         os.makedirs(os.path.join(DATA_PATH, sign, str(sequence)))
       except:
@@ -85,7 +78,7 @@ def generate_data():
     # Loop through actions
     for sign in signs:
       # Loop through sequences aka videos
-      for sequence in range(no_sequences):
+      for sequence in range(sequence_count):
         # Loop through video length aka sequence length
         for frame_num in range(sequence_length):
           # Read feed
@@ -105,7 +98,7 @@ def generate_data():
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
             # Show to screen
             cv2.imshow('OpenCV Feed', image)
-            cv2.waitKey(2000)
+            cv2.waitKey(1000)
           else: 
             cv2.putText(image, 'Collecting frames for {} Video Number {}'.format(sign, sequence), (15,12), 
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
@@ -127,10 +120,45 @@ def generate_data():
 
 # Preprocess Data and Create Labels and Features
 from sklearn.model_selection import train_test_split
-from tensorflow.python.keras.utils import to_categorical
+from tensorflow.python.keras.utils.all_utils import to_categorical;
+from tensorflow.python.keras.models import Sequential
+from tensorflow.python.keras.layers import LSTM, Dense
+from tensorflow.python.keras.callbacks import TensorBoard
 
 def process_signs():
   label_map = { label: num for num, label in enumerate(signs) }
+  sequences, labels = [], []
+  for sign in signs:
+      for sequence in range(sequence_count):
+          window = []
+          for frame_num in range(sequence_length):
+              res = np.load(os.path.join(DATA_PATH, sign, str(sequence), "{}.npy".format(frame_num)))
+              window.append(res)
+          sequences.append(window)
+          labels.append(label_map[sign])
+  
+  x = np.array(sequences)
+  
+  y = to_categorical(labels).astype(int)
+  X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.05)
+  
+  log_dir = os.path.join('Logs')
+  tb_callback = TensorBoard(log_dir=log_dir)
+  
+  model = Sequential()
+  model.add(LSTM(64, return_sequences=True, activation='relu', input_shape=(30,1662)))
+  model.add(LSTM(128, return_sequences=True, activation='relu'))
+  model.add(LSTM(64, return_sequences=False, activation='relu'))
+  model.add(Dense(64, activation='relu'))
+  model.add(Dense(32, activation='relu'))
+  model.add(Dense(signs.shape[0], activation='softmax'))
+  
+  model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
+  model.fit(X_train, y_train, epochs=2000, callbacks=[tb_callback])
+  
+  model.save('action.h5')
+  del model
+  
 
 if __name__ == '__main__':
-  generate_data()
+  process_signs()
