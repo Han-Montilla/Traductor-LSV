@@ -138,15 +138,19 @@ def process_signs():
           labels.append(label_map[sign])
   
   x = np.array(sequences)
-  
   y = to_categorical(labels).astype(int)
-  X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.05)
+  x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.05)
   
-  log_dir = os.path.join('Logs')
+  print(f'{x.shape}, {y.shape}')
+  
+  log_dir = os.path.join('logs')
   tb_callback = TensorBoard(log_dir=log_dir)
   
   model = Sequential()
-  model.add(LSTM(64, return_sequences=True, activation='relu', input_shape=(30,1662)))
+  
+  model.predict()
+  
+  model.add(LSTM(64, return_sequences=True, activation='relu', input_shape=(30,126)))
   model.add(LSTM(128, return_sequences=True, activation='relu'))
   model.add(LSTM(64, return_sequences=False, activation='relu'))
   model.add(Dense(64, activation='relu'))
@@ -154,11 +158,10 @@ def process_signs():
   model.add(Dense(signs.shape[0], activation='softmax'))
   
   model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
-  model.fit(X_train, y_train, epochs=2000, callbacks=[tb_callback])
+  model.fit(x_train, y_train, epochs=2000, callbacks=[tb_callback])
   
-  model.save('action.h5')
+  model.save('signs.h5')
   del model
-  
 
 if __name__ == '__main__':
   process_signs()
