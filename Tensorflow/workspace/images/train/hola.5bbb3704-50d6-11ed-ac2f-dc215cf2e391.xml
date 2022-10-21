@@ -1,0 +1,26 @@
+<annotation>
+	<folder>collectedimages</folder>
+	<filename>hola.5bbb3704-50d6-11ed-ac2f-dc215cf2e391.jpg</filename>
+	<path>C:\Users\Kevin Han\Desktop\proyecto tesis\RealTimeObjectDetection\Tensorflow\workspace\images\collectedimages\hola.5bbb3704-50d6-11ed-ac2f-dc215cf2e391.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>640</width>
+		<height>480</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>hola</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>204</xmin>
+			<ymin>54</ymin>
+			<xmax>470</xmax>
+			<ymax>457</ymax>
+		</bndbox>
+	</object>
+</annotation>

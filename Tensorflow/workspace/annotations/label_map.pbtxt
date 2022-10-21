@@ -1,0 +1,12 @@
+item { 
+	name:'a'
+	id:1
+}
+item { 
+	name:'hola'
+	id:2
+}
+item { 
+	name:'si'
+	id:3
+}
