@@ -3,10 +3,16 @@ import numpy as np
 import mediapipe as mp
 import os
 
+from sklearn.model_selection import train_test_split
+from tensorflow.python.keras.utils.all_utils import to_categorical;
+from tensorflow.python.keras.models import Sequential
+from tensorflow.python.keras.layers import LSTM, Dense
+from tensorflow.python.keras.callbacks import TensorBoard
+
 # Global Variables
 mp_holistic = mp.solutions.mediapipe.python.solutions.holistic  # Holistic model
 mp_drawing = mp.solutions.mediapipe.python.solutions.drawing_utils  # Drawing utilities
-signs = np.array(['a']) # detectable signs
+signs = np.array(['_', 'a']) # detectable signs
 sequence_count = 30 # Amound of sequences
 sequence_length = 30 # Frames per sequence
 
@@ -41,10 +47,28 @@ def extract_keypoints(results):
   rh = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*3)
   return np.concatenate([lh, rh])
 
+def load_model(path: str) -> Sequential:
+  model = Sequential()
+  model.add(LSTM(64, return_sequences=True, activation='relu', input_shape=(30,126)))
+  model.add(LSTM(128, return_sequences=True, activation='relu'))
+  model.add(LSTM(64, return_sequences=False, activation='relu'))
+  model.add(Dense(64, activation='relu'))
+  model.add(Dense(32, activation='relu'))
+  model.add(Dense(signs.shape[0], activation='softmax'))
+  model.load_weights(path)
+  return model
+
 def main():
+  # loading model + weights
+  model = load_model('signs.h5')
+  
+  sequence = []
+  sentence = []
+  threshold = 0.5
+  
   cap = cv2.VideoCapture(0)
   # Set mediapipe model 
-  with mp_holistic.Holistic() as holistic:
+  with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
     while cap.isOpened():
       # Read feed
       ret, frame = cap.read()
@@ -54,7 +78,19 @@ def main():
       
       # Draw landmarks
       draw_styled_landmarks(image, results)
-
+      
+      # Predictions!
+      keypoints = extract_keypoints(results)
+      sequence.append(keypoints)
+      sequence = sequence[-5:]
+      
+      if len(sequence) >= 5:
+        res = model.predict(np.expand_dims(sequence, axis=0))[0]
+        
+        if res[np.argmax(res)] > threshold:
+          predicted_sign = signs[np.argmax(res)]
+          cv2.putText(image, f'{predicted_sign}', (50,50), cv2.FONT_HERSHEY_SIMPLEX, 3, (0,255, 0), 2, cv2.LINE_AA)
+          
       # Show to screen
       cv2.imshow('LSV Traductor', image)
 
@@ -119,11 +155,7 @@ def generate_data():
 
 
 # Preprocess Data and Create Labels and Features
-from sklearn.model_selection import train_test_split
-from tensorflow.python.keras.utils.all_utils import to_categorical;
-from tensorflow.python.keras.models import Sequential
-from tensorflow.python.keras.layers import LSTM, Dense
-from tensorflow.python.keras.callbacks import TensorBoard
+
 
 def process_signs():
   label_map = { label: num for num, label in enumerate(signs) }
@@ -141,14 +173,10 @@ def process_signs():
   y = to_categorical(labels).astype(int)
   x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.05)
   
-  print(f'{x.shape}, {y.shape}')
-  
   log_dir = os.path.join('logs')
   tb_callback = TensorBoard(log_dir=log_dir)
   
   model = Sequential()
-  
-  model.predict()
   
   model.add(LSTM(64, return_sequences=True, activation='relu', input_shape=(30,126)))
   model.add(LSTM(128, return_sequences=True, activation='relu'))
@@ -164,4 +192,4 @@ def process_signs():
   del model
 
 if __name__ == '__main__':
-  process_signs()
+  main()
