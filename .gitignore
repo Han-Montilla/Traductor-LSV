@@ -1,6 +1,7 @@
 # our own
 workspace/images/test/**
 workspace/images/train/**
+workspace/images/collected/**
 workspace/annotations/**
 
 # Created by https://www.toptal.com/developers/gitignore/api/obsidian,python,macos,windows,visualstudiocode
