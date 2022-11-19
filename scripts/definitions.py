@@ -15,10 +15,11 @@ LABEL_MAP_PATH = os.path.join(ANNOTATIONS_DIR, 'label_map.pbtxt')
 # Settings & Constants 🧮
 SIGNS = [
   # letras
-  'a', 'b', 'c',
+  'a'
+  # 'a', 'b', 'c',
   
   # palabras
-  'hola',
+  # 'hola',
   
   # frases
   

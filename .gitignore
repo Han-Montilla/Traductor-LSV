@@ -4,6 +4,8 @@ workspace/images/train/**
 workspace/images/collected/**
 workspace/annotations/**
 
+.vscode/
+
 # Created by https://www.toptal.com/developers/gitignore/api/obsidian,python,macos,windows,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=obsidian,python,macos,windows,visualstudiocode
 
