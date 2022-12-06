@@ -19,16 +19,17 @@ LABELMAP_PATH = join(ANNOTATIONS_DIR, 'label_map.pbtxt')
 TRAIN_TF_RECORD_PATH = join(ANNOTATIONS_DIR, 'train.record')
 TEST_TF_RECORD_PATH = join(ANNOTATIONS_DIR, 'test.record')
 CURRENT_MODEL_DIR = join(MODELS_DIR, 'my-ssd-mobnet') # nuestro modelo
-CURRENT_PRETRAINED_MODEL_DIR = join(PRETRAINED_MODELS_DIR, 'ssd_mobilenet_v2_fpnlite_640x640_coco17_tpu-8') # modelo pre-entrenado que usamos
+CURRENT_PRETRAINED_MODEL_DIR = join(PRETRAINED_MODELS_DIR, 'ssd_mobilenet_v2_fpnlite_320x320_coco17_tpu-8') # modelo pre-entrenado que usamos
 PRETRAINED_CP_PATH = join(CURRENT_PRETRAINED_MODEL_DIR, 'checkpoint', 'ckpt-0')
 CONFIG_PATH = join(CURRENT_MODEL_DIR, 'pipeline.config')
+CURRENT_CP_PATH = join(CURRENT_MODEL_DIR, f'ckpt-{15}')
 
-print(PRETRAINED_CP_PATH)
+print(CURRENT_CP_PATH)
 
 # Settings & Constants 🧮
 SIGNS = [
   # letras
-  'a', 'b',
+  'a', 'b', 'c',
   
   # palabras
   # 'hola',

@@ -3,6 +3,7 @@ workspace/images/test/**
 workspace/images/train/**
 workspace/images/collected/**
 workspace/annotations/**
+workspace/pre-trained-models/**
 
 .vscode/
 
