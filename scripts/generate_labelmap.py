@@ -1,6 +1,6 @@
-from definitions import LABEL_MAP_PATH, SIGNS
+from definitions import LABELMAP_PATH, SIGNS
 
-with open(LABEL_MAP_PATH, 'w') as f:
+with open(LABELMAP_PATH, 'w') as f:
   id = 0
   for sign in SIGNS:
     id += 1
