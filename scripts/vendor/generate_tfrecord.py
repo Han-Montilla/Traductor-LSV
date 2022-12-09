@@ -24,8 +24,7 @@ import xml.etree.ElementTree as ET
 import argparse
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'    # Suppress TensorFlow logging (1)
-import tensorflow._api.v2.compat.v1 as tf
-
+import tensorflow.compat.v1 as tf
 from PIL import Image
 from object_detection.utils import dataset_util, label_map_util
 from collections import namedtuple
@@ -81,19 +80,15 @@ def xml_to_csv(path):
     for xml_file in glob.glob(path + '/*.xml'):
         tree = ET.parse(xml_file)
         root = tree.getroot()
-        filename = root.find('filename').text
-        width = int(root.find('size').find('width').text)
-        height = int(root.find('size').find('height').text)
         for member in root.findall('object'):
-            bndbox = member.find('bndbox')
-            value = (filename,
-                     width,
-                     height,
-                     member.find('name').text,
-                     int(bndbox.find('xmin').text),
-                     int(bndbox.find('ymin').text),
-                     int(bndbox.find('xmax').text),
-                     int(bndbox.find('ymax').text),
+            value = (root.find('filename').text,
+                     int(root.find('size')[0].text),
+                     int(root.find('size')[1].text),
+                     member[0].text,
+                     int(member[4][0].text),
+                     int(member[4][1].text),
+                     int(member[4][2].text),
+                     int(member[4][3].text)
                      )
             xml_list.append(value)
     column_name = ['filename', 'width', 'height',
@@ -113,12 +108,12 @@ def split(df, group):
 
 
 def create_tf_example(group, path):
-    
     with tf.gfile.GFile(os.path.join(path, '{}'.format(group.filename)), 'rb') as fid:
         encoded_jpg = fid.read()
     encoded_jpg_io = io.BytesIO(encoded_jpg)
     image = Image.open(encoded_jpg_io)
     width, height = image.size
+
     filename = group.filename.encode('utf8')
     image_format = b'jpg'
     xmins = []

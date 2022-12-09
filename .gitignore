@@ -1,11 +1,15 @@
-# our own
+.vscode/
+protoc/**
+
 workspace/images/test/**
 workspace/images/train/**
+workspace/images/validation/**
 workspace/images/collected/**
 workspace/annotations/**
+workspace/models/**
 workspace/pre-trained-models/**
 
-.vscode/
+!**.gitkeep
 
 # Created by https://www.toptal.com/developers/gitignore/api/obsidian,python,macos,windows,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=obsidian,python,macos,windows,visualstudiocode
