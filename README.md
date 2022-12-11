@@ -33,4 +33,3 @@
 
 1. Choose which model to use (for transfer learning) on tensorflows official [model zoo](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/tf2_detection_zoo.md)
 2. Update the `Definitions` section's `PRETRAINED_MODEL_NAME` and `PRETRAINED_MODEL_URL` variables to match your choice. Optionally change `MODEL_NAME` variable to change the generate model folder name
-3. 
