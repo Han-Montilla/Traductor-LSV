@@ -4,7 +4,9 @@ protoc/**
 workspace/images/test/**
 workspace/images/train/**
 workspace/images/validation/**
-workspace/images/collected/**
+workspace/images/captured/**
+workspace/images/labeling/**
+!workspace/images/labeling/collected
 workspace/annotations/**
 workspace/models/**
 workspace/pre-trained-models/**
