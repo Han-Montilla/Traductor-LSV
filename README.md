@@ -5,6 +5,8 @@
 ## Initial Setup
 
 1. Clone this repo `git clone https://github.com/Han-Montilla/Traductor-LSV.git`
+2. Visual Studio
+3. Make sure you have a python version >=3.10.x
 2. Install virtual enviorment package `pip install virtualenv`
 3. Create virtual enviorment `python -m venv .env` and activate it:
 	- on windows `.env\Scripts\activate.bat`
