@@ -6,6 +6,7 @@
 /images/rejected/**
 /images/temp/**
 /data/**
+# /models/**
 
 !**.gitkeep
 
