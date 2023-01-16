@@ -13,4 +13,4 @@ FOR DETECTING:
 `python -m venv .env`
 `source .env/Scripts/activate` or `.env\Scripts\activate.bat`
 `python -m pip install --upgrade pip`
-`pip install tensorflow opencv-python mediapipe scikit-learn ipykernel`
+`pip install tensorflow opencv-python mediapipe scikit-learn ipykernel tensorflowjs`
