@@ -3,8 +3,11 @@
   import { Hands, HAND_CONNECTIONS, VERSION as MP_VERSION } from '@mediapipe/hands'
   import { Camera } from '@mediapipe/camera_utils';
   import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils'
-import useMp from '../services/mp';
+  import useMp from '../services/mp';
+import useTf from '../services/tf';
 
+const { loadModel, predict, prediction } = useTf();
+const { extractKeypointsRH } = useMp();
   const videoEl = ref<HTMLVideoElement>();
   const canvasEl = ref<HTMLCanvasElement>();
   const run = ref(false);
@@ -15,13 +18,14 @@ import useMp from '../services/mp';
     height: 720
   });
   
-  onMounted(() => {
+  onMounted(async () => {
     if (!videoEl.value || !canvasEl.value) return;
     const ctx = canvasEl.value.getContext('2d');
     if (ctx === null) return;
 
-    const sequence: number[] = [];
-    const { extractKeypointsRH } = useMp();
+    await loadModel('v1');
+    const sequence: number[][] = [];
+    const SEQUENCE_LENGHT = 10;
 
     const mpHands = new Hands({
       locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@${MP_VERSION}/${file}`
@@ -29,7 +33,7 @@ import useMp from '../services/mp';
     mpHands.setOptions({
       maxNumHands: 1,
       modelComplexity: 1,
-      minDetectionConfidence: 0.5,
+      minDetectionConfidence: 0.75,
       minTrackingConfidence: 0.5
     });
 
@@ -41,7 +45,6 @@ import useMp from '../services/mp';
       /// drawing landmarks
       ctx.clearRect(0, 0, canvasEl.value.width, canvasEl.value.height);
       ctx.drawImage(results.image, 0, 0, canvasEl.value.width, canvasEl.value.height);
-      const keypoints = extractKeypointsRH(results);
       
       if (results.multiHandLandmarks) {
         for (const landmarks of results.multiHandLandmarks) {
@@ -50,8 +53,17 @@ import useMp from '../services/mp';
         }
       }
 
-      ctx.restore();
+      const keypoints = extractKeypointsRH(results);
 
+      sequence.unshift(keypoints);
+      if (sequence.length === SEQUENCE_LENGHT) {
+        predict(sequence);
+        sequence.pop();
+      }
+
+      
+      ctx.restore();
+1
 
     })
     const camera = new Camera(videoEl.value, {
@@ -76,6 +88,9 @@ import useMp from '../services/mp';
 
 <template>
   <div>
+    <div class="prediction">
+      {{ prediction }}
+    </div>
     <video ref="videoEl"/>
     <canvas ref="canvasEl" :width="resolution.width" :height="resolution.height"/>
     <button @click="toggle">
@@ -85,6 +100,13 @@ import useMp from '../services/mp';
 </template>
 
 <style scoped>
+  .prediction {
+    width: 100%;
+    font-size: 64px;
+    font-weight: bolder;
+    text-align: center;
+    color: white;
+  }
   video {
     display: none;
   }
