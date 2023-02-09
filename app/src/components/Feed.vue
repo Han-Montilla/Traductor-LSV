@@ -1,15 +1,15 @@
 <script setup lang="ts">
-  import { onMounted, reactive, ref, computed } from 'vue';
-  // import { Hands, HAND_CONNECTIONS } from '@mediapipe/hands'
-  // import { Camera } from '@mediapipe/camera_utils';
+  import { onMounted, reactive, ref, computed, Ref } from 'vue';
+  import { Hands, HAND_CONNECTIONS } from '@mediapipe/hands'
+  import { Camera } from '@mediapipe/camera_utils';
   // import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils'
   import useMp from '../services/mp';
   import useTf from '../services/tf';
 
   const { loadModel, predict } = useTf();
   const { extractKeypointsRH } = useMp();
-  const videoEl = ref<HTMLVideoElement>();
-  const canvasEl = ref<HTMLCanvasElement>();
+  const videoEl = ref<HTMLVideoElement>() as Ref<HTMLVideoElement>;
+  const canvasEl = ref<HTMLCanvasElement>() as Ref<HTMLCanvasElement>;
 
   const prediction = reactive({
     sign: 'none',
@@ -24,13 +24,11 @@
 
   const resolution = reactive({
     width: 1280,
-    height: 720
+    height: 960
   });
   
   onMounted(async () => {
-    if (!videoEl.value || !canvasEl.value) return;
-    const ctx = canvasEl.value.getContext('2d');
-    if (ctx === null) return;
+    const ctx = canvasEl.value.getContext('2d') as CanvasRenderingContext2D;
 
     await loadModel('v1');
     const sequence: number[][] = [];
@@ -53,8 +51,6 @@
 
     // @ts-ignore
     mpHands.onResults(results => {
-      if (!videoEl.value || !canvasEl.value) return;
-
       ctx.save();
 
       /// drawing landmarks
@@ -70,7 +66,8 @@
         }
       }
 
-      const { keypoints } = extractKeypointsRH(results);
+      const { keypoints, handedness } = extractKeypointsRH(results);
+      console.log(handedness);
       sequence.unshift(keypoints);
       if (sequence.length === SEQUENCE_LENGHT) {
         const res = predict(sequence);
@@ -81,17 +78,18 @@
       ctx.restore();
 
     })
-    // @ts-ignore
-    const camera = new window.Camera(videoEl.value, {
+    const camera = new Camera(videoEl.value, {
       onFrame: async () => {
-        if (!videoEl.value) return;
         await mpHands.send({ image: videoEl.value });
       },
       width: resolution.width,
-      height: resolution.height
+      height: resolution.height,
+      facingMode: 'user'
     });
 
     camera.start();
+    console.log(Object.keys(camera));
+    console.log(camera);
 
   });
 </script>

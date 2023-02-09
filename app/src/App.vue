@@ -1,14 +1,12 @@
 <script setup lang="ts">
-  import Feed from './components/Feed.vue';
-  import useTf from './services/tf';
-
-  const tf = useTf();
-
+  import Webcam from './components/Webcam.vue'
+  import Feed from './components/Feed.vue'
 </script>
 
 <template>
   <main>
-    <Feed />
+    <Webcam />
+    <!-- <Feed /> -->
   </main>
 </template>
 
