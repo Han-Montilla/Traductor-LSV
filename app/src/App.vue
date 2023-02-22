@@ -5,8 +5,8 @@
 
 <template>
   <main>
-    <Webcam />
-    <!-- <Feed /> -->
+    <!-- <Webcam /> -->
+    <Feed />
   </main>
 </template>
 

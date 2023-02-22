@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { onMounted, reactive, ref, computed, Ref } from 'vue';
-  import { Hands, HAND_CONNECTIONS } from '@mediapipe/hands'
-  import { Camera } from '@mediapipe/camera_utils';
+  // import { Hands, HAND_CONNECTIONS } from '@mediapipe/hands'
+  // import { Camera } from '@mediapipe/camera_utils';
   // import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils'
   import useMp from '../services/mp';
   import useTf from '../services/tf';
@@ -30,7 +30,7 @@
   onMounted(async () => {
     const ctx = canvasEl.value.getContext('2d') as CanvasRenderingContext2D;
 
-    await loadModel('v1');
+    await loadModel();
     const sequence: number[][] = [];
     const SEQUENCE_LENGHT = 10;
 
@@ -67,7 +67,6 @@
       }
 
       const { keypoints, handedness } = extractKeypointsRH(results);
-      console.log(handedness);
       sequence.unshift(keypoints);
       if (sequence.length === SEQUENCE_LENGHT) {
         const res = predict(sequence);
@@ -78,7 +77,9 @@
       ctx.restore();
 
     })
-    const camera = new Camera(videoEl.value, {
+
+    // @ts-ignore
+    const camera = new window.Camera(videoEl.value, {
       onFrame: async () => {
         await mpHands.send({ image: videoEl.value });
       },
@@ -88,8 +89,6 @@
     });
 
     camera.start();
-    console.log(Object.keys(camera));
-    console.log(camera);
 
   });
 </script>
