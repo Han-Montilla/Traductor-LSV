@@ -4,7 +4,6 @@
   background-color: #1b2021;
 }
 
-// Reset
 *, *::before, *::after {
   box-sizing: border-box;
 }

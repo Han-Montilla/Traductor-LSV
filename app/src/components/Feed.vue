@@ -15,16 +15,20 @@
     sign: 'none',
     certainty: 0
   });
+
+  const delta = ref(0);
+  const deltaHistory = ref<number[]>([]);
+  const lastTime = ref<number>(Date.now());
   
   const predictionText = computed(
-    () => prediction.certainty > 0.75 && prediction.sign !== 'none'
+    () => prediction.certainty > 0.50
       ? `${prediction.sign} ${(prediction.certainty * 100).toFixed(0)}%` 
       : ``
   );
 
   const resolution = reactive({
     width: 1280,
-    height: 960
+    height: 720
   });
   
   onMounted(async () => {
@@ -51,8 +55,11 @@
 
     // @ts-ignore
     mpHands.onResults(results => {
-      ctx.save();
+      const thisTime = Date.now();
+      delta.value = 1000 / (thisTime - lastTime.value);
+      lastTime.value = thisTime;
 
+      ctx.save();
       /// drawing landmarks
       ctx.clearRect(0, 0, canvasEl.value.width, canvasEl.value.height);
       ctx.drawImage(results.image, 0, 0, canvasEl.value.width, canvasEl.value.height);
@@ -100,20 +107,32 @@
     </div>
     <video ref="videoEl"/>
     <canvas ref="canvasEl" :width="resolution.width" :height="resolution.height"/>
+    <div class="fps-counter">
+      fps: {{ delta.toFixed(0) }}
+    </div>
   </div>
 </template>
 
 <style scoped>
   .prediction {
     width: 100%;
-    height: 81px;
+    height: 128px;
     font-family: 'Courier New', Courier, monospace;
-    font-size: 64px;
+    line-height: 1;
+    font-size: 128px;
     font-weight: bolder;
     text-align: center;
     color: white;
   }
   video {
     display: none;
+  }
+  .fps-counter {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    font-size: 64px;
+    color: white;
+    font-family: 'Courier New', Courier, monospace;
   }
 </style>
