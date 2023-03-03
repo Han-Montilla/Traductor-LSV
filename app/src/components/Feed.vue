@@ -38,9 +38,8 @@
     const sequence: number[][] = [];
     const SEQUENCE_LENGHT = 10;
 
-    // @ts-ignore
+
     const mpHands = new window.Hands({
-      // @ts-ignore
       locateFile: file => {
         const res = `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
         return res;
@@ -53,7 +52,7 @@
       minTrackingConfidence: 0.5
     });
 
-    // @ts-ignore
+
     mpHands.onResults(results => {
       const thisTime = Date.now();
       delta.value = 1000 / (thisTime - lastTime.value);
@@ -66,9 +65,7 @@
       
       if (results.multiHandLandmarks) {
         for (const landmarks of results.multiHandLandmarks) {
-          // @ts-ignore
           window.drawConnectors(ctx, landmarks, window.HAND_CONNECTIONS, {color: '#00FF00', lineWidth: 5});
-          // @ts-ignore
           window.drawLandmarks(ctx, landmarks, {color: '#FF0000', lineWidth: 2});
         }
       }
@@ -83,7 +80,7 @@
       }
       ctx.restore();
 
-    })
+    });
 
     // @ts-ignore
     const camera = new window.Camera(videoEl.value, {

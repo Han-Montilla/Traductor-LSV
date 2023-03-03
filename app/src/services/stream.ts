@@ -4,7 +4,7 @@ const useStream = () => ({ init, currentStream, getAvailableCameras, currentDevi
 
 const getAvailableCameras = async () => {
   const devices = await navigator.mediaDevices.enumerateDevices();
-  return devices.filter(d => d.kind === 'videoinput');
+  return devices.filter(({ kind, deviceId }) => kind === 'videoinput' && deviceId !== '');
 }
 
 const init = async () => {
@@ -15,15 +15,19 @@ const init = async () => {
 const currentDeviceId = ref<string>('');
 const currentStream = computed(async () => {
   try {
-    let t = await navigator.mediaDevices.getUserMedia({
+    const id = currentDeviceId.value;
+    const t = await navigator.mediaDevices.getUserMedia({
       audio: false,
       video: {
         facingMode: { ideal: "user" },
-        deviceId: { exact: currentDeviceId.value }
+        deviceId: { ideal: id }
       }
     })
     return t;
-  } catch {
+  } catch (e) {
+    if (e instanceof DOMException) {
+      console.log(e.message);
+    }
     return null;
   }
 });

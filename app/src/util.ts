@@ -20,3 +20,6 @@ export const mapValue = (value: number, from: [number, number], to: [number, num
 
   return b1 + (((value - a1)*(b2 - b1)) / (a2 - a1));
 }
+
+export const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+export const randFloat = (min: number, max: number) => Math.random() * (max - min + 1) + min;

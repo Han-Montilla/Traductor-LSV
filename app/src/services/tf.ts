@@ -20,12 +20,10 @@ const predict = (sequence: readonly number[][]) => {
   const values = res.dataSync();
   const certainty = Math.max(...values);
   const sign = SIGNS[values.indexOf(certainty)];
-
   return {
     sign,
     certainty,
   }
-
 }
 
 export default useTf;
