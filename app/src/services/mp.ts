@@ -1,12 +1,12 @@
 import { Results } from "@mediapipe/hands";
 import { ref } from "vue";
 
-const useMp = () => ({extractKeypointsRH});
+const useMp = () => ({extractKeypoints});
 
 const HAND_LANDMARK_COUNT = 21; // https://mediapipe.dev/images/mobile/hand_landmarks.png
 const HAND_LANDMARK_POINTS = HAND_LANDMARK_COUNT * 3;
 
-const extractKeypointsRH = ({ multiHandLandmarks, multiHandedness }: Results): { keypoints: number[], handedness: string } => {
+const extractKeypoints = ({ multiHandLandmarks, multiHandedness }: Results): { keypoints: number[], handedness: string } => {
 
   if (
     multiHandLandmarks.length <= 0

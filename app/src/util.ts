@@ -23,3 +23,30 @@ export const mapValue = (value: number, from: [number, number], to: [number, num
 
 export const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 export const randFloat = (min: number, max: number) => Math.random() * (max - min + 1) + min;
+
+export const findIndexOfMax = (arr: number[]) => {
+  let remaining = 1;
+  let maxIndex = 0;
+  for (let i = 0; i < arr.length; i++) {
+    const element = arr[i];
+
+    remaining -= element;
+
+    if (arr[maxIndex] < element) maxIndex = i;
+
+    if (arr[maxIndex] >= remaining) return maxIndex;
+  }
+  return 0;
+}
+
+export const arrAverage = (arr: number[]) => arr.reduce((a, b) => a + b) / arr.length;
+
+type rgbArr = [number, number, number];
+export function colorRange(color1: rgbArr, color2: rgbArr, weight: number) {
+  var w1 = weight;
+  var w2 = 1 - w1;
+  var [r, g, b] = [Math.round(color1[0] * w1 + color2[0] * w2),
+      Math.round(color1[1] * w1 + color2[1] * w2),
+      Math.round(color1[2] * w1 + color2[2] * w2)];
+  return `rgb(${r}, ${g}, ${b})`;
+}
