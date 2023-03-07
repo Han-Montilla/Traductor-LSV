@@ -24,7 +24,7 @@
     mp: true,
     camera: true
   });
-  const resolution = { width: 960, height: 600 }
+  const resolution = { width: 960, height: 640 }
   const canvasSize = reactive({ height: 0, width: 0 });
   const cameras = ref<MediaDeviceInfo[]>([]);
   const { Hands, HAND_CONNECTIONS, drawConnectors, drawLandmarks } = window;
@@ -98,7 +98,6 @@
   onMounted(async () => {
     await init();
     await loadModel();
-    cameras.value = await getAvailableCameras();
     const mpHands = new Hands({ locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` });
     await mpHands.initialize();
     mpHands.setOptions(mpOptions);
@@ -131,10 +130,15 @@
     }, { immediate: true })
   
     let ctx = canvasEl.value.getContext('2d') as CanvasRenderingContext2D;
+    let hasInit = false;
 
     videoEl.value.onloadedmetadata = async () => {
-      await videoEl.value.play()
-      requestAnimationFrame(tick);
+      await videoEl.value.play();
+      if (!hasInit) {
+        cameras.value = await getAvailableCameras();
+        requestAnimationFrame(tick);
+        hasInit = true;
+      }
     }
   
     const tick = async () => {
@@ -149,7 +153,7 @@
         ctx.scale(-1, 1);
       }
       ctx.drawImage(videoEl.value, 0, 0, canvasSize.width, canvasSize.height);
-      await mpHands.send({ image: canvasEl.value });
+      // await mpHands.send({ image: canvasEl.value });
       ctx.restore();
 
       if (loading.mp) loading.mp = false
@@ -204,7 +208,7 @@
     <div class="main">
       <video ref="videoEl"/>
       <div :style="{ display: loading.mp ? 'none' : undefined }" class="container">
-        <div class="camera">
+        <div class="camera" :style="{width: `${resolution.width}px`, height: `${resolution.height}px`,}">
           <div :style="{
             width: `${canvasSize.width}px`, height: `${canvasSize.height}px`,
             position: 'relative',
@@ -368,7 +372,6 @@
     max-width: 1500px;
     height: 100%;
     color: white;
-    /* overflow: hidden; */
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
   .container {
@@ -387,6 +390,7 @@
   }
 
   .camera {
+    display: grid;
     justify-content: center;
     justify-items: center;
     align-items: center;

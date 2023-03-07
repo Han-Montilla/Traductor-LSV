@@ -1,11 +1,15 @@
 type Resolution = { width: number, height: number }
 export const fitToScreen = (screen: Resolution, raw: Resolution): Resolution => {
-  let scaleFactor = screen.width > screen.height
-    ? screen.width / raw.width
-    : screen.height / raw.height;
-
+  const widthScaleFactor = screen.width / raw.width ;
+  const heightScaleFactor = screen.height / raw.height;
+  
+  const scaleFactor = widthScaleFactor < heightScaleFactor
+  ? widthScaleFactor : heightScaleFactor;
+  
   return { width: raw.width * scaleFactor, height: raw.height * scaleFactor }
 }
+
+console.log(fitToScreen({ width: 960, height: 640 }, { width: 960, height: 960 }))
 
 /**
  * @copyright https://rosettacode.org/wiki/Map_range
