@@ -43,7 +43,7 @@
     showLandmarks: true,
     showFps: false,
     precisionThreshhold: 0.75,
-    mode: 'single',
+    mode: 'complete',
     intervalCooldown: 1500,
   });
   const intervalCooldownIndicator = ref(options.intervalCooldown);
@@ -56,7 +56,7 @@
   });
   const mpOptionsIndicators = reactive({...mpOptions});
 
-  const historial = ref<string[]>(Array(3000).fill('a'));
+  const historial = ref<string[]>([]);
   const predictionArray = ref<number[]>(Array(27).fill(0));
   const predictionIndex = computed(() => findIndexOfMax(predictionArray.value));
   const certainty = computed(() => predictionArray.value[predictionIndex.value]);
@@ -505,14 +505,13 @@
   .log {
     grid-area: log;
     width: 100%;
-    height: 100%;
     padding: 16px;
     
     display: grid;
     place-items: center;
     justify-items: start;
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
+    grid-template-rows: 1fr 1fr;
     grid-template-areas:
       'prediction'
       'history'
@@ -545,16 +544,16 @@
     display: grid;
     grid-template-columns: repeat(27, 1fr);
     width: 100%;
-    height: auto;
+    max-height: 156px;
   }
 
   .sign-segment {
-    height: auto;
     width: 100%;
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: 9fr 1fr;
     border: rgba(255, 255, 255, 0.1) solid 1px;
+    max-height: 156px;
   }
   .sign-bar {
     align-self: end;
@@ -609,8 +608,8 @@
     justify-items: start;
     align-items: start;
     line-height: 1;
-    height: 100%;
-    max-height: 200px;
+    height: auto;
+    max-height: 128px;
     overflow-y: scroll;
     -ms-overflow-style: none; /* for Internet Explorer, Edge */
     scrollbar-width: none; /* for Firefox */
