@@ -24,7 +24,7 @@
     mp: true,
     camera: true
   });
-  const resolution = { width: 960, height: 640 }
+  const resolution = { width: 910.22, height: 512 }
   const canvasSize = reactive({ height: 0, width: 0 });
   const cameras = ref<MediaDeviceInfo[]>([]);
   const { Hands, HAND_CONNECTIONS, drawConnectors, drawLandmarks } = window;
@@ -56,7 +56,7 @@
   });
   const mpOptionsIndicators = reactive({...mpOptions});
 
-  const historial = ref<string[]>([]);
+  const historial = ref<string[]>(Array(3000).fill('a'));
   const predictionArray = ref<number[]>(Array(27).fill(0));
   const predictionIndex = computed(() => findIndexOfMax(predictionArray.value));
   const certainty = computed(() => predictionArray.value[predictionIndex.value]);
@@ -373,6 +373,7 @@
     height: 100%;
     color: white;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
   }
   .container {
     width: 100%;
@@ -382,7 +383,7 @@
     place-items: center;
     justify-items: center;
     grid-template-columns: 3fr 1fr;
-    grid-template-rows: 3fr 2fr;
+    grid-template-rows: 1fr 1fr;
     grid-template-areas: 
       'camera options'
       'log log'
@@ -505,14 +506,13 @@
     grid-area: log;
     width: 100%;
     height: 100%;
-    max-height: 100%;
     padding: 16px;
     
     display: grid;
     place-items: center;
     justify-items: start;
     grid-template-columns: 1fr;
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: auto auto;
     grid-template-areas:
       'prediction'
       'history'
@@ -521,13 +521,11 @@
   .prediction-area {
     grid-area: prediction;
     width: 100%;
-    height: 215px;
   }
   .single-prediction {
-    font-size: 42px;
+    font-size: 32px;
     font-family: 'Courier New', Courier, monospace;
     line-height: 1.25;
-    height: 100%;
   }
   
   .highlighter-text {
@@ -547,12 +545,11 @@
     display: grid;
     grid-template-columns: repeat(27, 1fr);
     width: 100%;
-    height: 215px;
+    height: auto;
   }
 
   .sign-segment {
-    height: 100%;
-    max-height: 215px;
+    height: auto;
     width: 100%;
     display: grid;
     grid-template-columns: 1fr;
@@ -580,12 +577,11 @@
   
   .history-area {
     grid-area: history;
+    place-self: start;
     display: flex;
     flex-direction: column;
     height: 100%;
     width: 100%;
-    max-height: 215px;
-    widows: 100%;
     position: relative;
   }
 
@@ -602,17 +598,19 @@
   }
 
   .historial-label {
-    font-size: 42px;
+    font-size: 24px;
     font-family: 'Courier New', Courier, monospace;
   }
 
   .historial-logs {
-    font-size: 42px;
+    font-size: 24px;
     display: flex;
     flex-wrap: wrap;
     justify-items: start;
     align-items: start;
     line-height: 1;
+    height: 100%;
+    max-height: 200px;
     overflow-y: scroll;
     -ms-overflow-style: none; /* for Internet Explorer, Edge */
     scrollbar-width: none; /* for Firefox */
