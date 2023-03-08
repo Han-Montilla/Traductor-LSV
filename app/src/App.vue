@@ -153,7 +153,7 @@
         ctx.scale(-1, 1);
       }
       ctx.drawImage(videoEl.value, 0, 0, canvasSize.width, canvasSize.height);
-      // await mpHands.send({ image: canvasEl.value });
+      await mpHands.send({ image: canvasEl.value });
       ctx.restore();
 
       if (loading.mp) loading.mp = false
