@@ -9,8 +9,6 @@ export const fitToScreen = (screen: Resolution, raw: Resolution): Resolution => 
   return { width: raw.width * scaleFactor, height: raw.height * scaleFactor }
 }
 
-console.log(fitToScreen({ width: 960, height: 640 }, { width: 960, height: 960 }))
-
 /**
  * @copyright https://rosettacode.org/wiki/Map_range
  * @param {number} value - value to be mapped 

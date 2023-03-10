@@ -10,8 +10,12 @@ const loadModel = async () => {
 }
 
 const predict = (sequence: readonly number[][]) => {
-  const res = _model.predict(tf.tensor([sequence])) as tf.Tensor;
-  return res.dataSync();
+  const tensor = tf.tensor([sequence]);
+  if (tensor.shape[0] === null, tensor.shape[1] === 10, tensor.shape[2] === 63) {
+    const res = _model.predict(tensor) as tf.Tensor;
+    return res.dataSync();
+  }
+  return new Float32Array(27).fill(0);
 } 
 
 export default useTf;

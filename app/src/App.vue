@@ -43,7 +43,7 @@
     showLandmarks: true,
     showFps: false,
     precisionThreshhold: 0.75,
-    mode: 'complete',
+    mode: 'single',
     intervalCooldown: 1500,
   });
   const intervalCooldownIndicator = ref(options.intervalCooldown);
