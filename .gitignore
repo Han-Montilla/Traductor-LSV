@@ -1,20 +1,14 @@
-.vscode/
-protoc/**
 
-workspace/images/test/**
-workspace/images/train/**
-workspace/images/validation/**
-workspace/images/captured/**
-workspace/images/labeling/**
-!workspace/images/labeling/collected
-workspace/annotations/**
-workspace/models/**
-workspace/pre-trained-models/**
+.env/
+/images/collected/**
+/images/processed/**
+/images/preprocessed/**
+/images/rejected/**
+/images/temp/**
+/data/**
+/models/**
 
 !**.gitkeep
-
-# Created by https://www.toptal.com/developers/gitignore/api/obsidian,python,macos,windows,visualstudiocode
-# Edit at https://www.toptal.com/developers/gitignore?templates=obsidian,python,macos,windows,visualstudiocode
 
 ### macOS ###
 # General
@@ -24,6 +18,7 @@ workspace/pre-trained-models/**
 
 # Icon must end with two \r
 Icon
+
 
 # Thumbnails
 ._*
@@ -47,10 +42,6 @@ Temporary Items
 ### macOS Patch ###
 # iCloud generated files
 *.icloud
-
-### Obsidian ###
-# config dir
-.obsidian/
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
@@ -214,6 +205,11 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
+### Python Patch ###
+# Poetry local configuration file - https://python-poetry.org/docs/configuration/#local-configuration
+poetry.toml
+
+
 ### VisualStudioCode ###
 .vscode/*
 !.vscode/settings.json
@@ -259,4 +255,4 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# End of https://www.toptal.com/developers/gitignore/api/obsidian,python,macos,windows,visualstudiocode
+# End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode,macos,windows
