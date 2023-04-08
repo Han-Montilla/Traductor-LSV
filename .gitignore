@@ -1,14 +1,22 @@
+# Created by https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks,visualstudiocode,macos,windows,obsidian
+# Edit at https://www.toptal.com/developers/gitignore?templates=python,jupyternotebooks,visualstudiocode,macos,windows,obsidian
 
-.env/
-/images/collected/**
-/images/processed/**
-/images/preprocessed/**
-/images/rejected/**
-/images/temp/**
-/data/**
-/models/**
+# Project Specific
 
-!**.gitkeep
+
+### JupyterNotebooks ###
+# gitignore template for Jupyter Notebooks
+# website: http://jupyter.org/
+
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+# IPython
+profile_default/
+ipython_config.py
+
+# Remove previous ipynb_checkpoints
+#   git rm -r .ipynb_checkpoints/
 
 ### macOS ###
 # General
@@ -42,6 +50,10 @@ Temporary Items
 ### macOS Patch ###
 # iCloud generated files
 *.icloud
+
+### Obsidian ###
+# config dir
+.obsidian/
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
@@ -122,11 +134,8 @@ docs/_build/
 target/
 
 # Jupyter Notebook
-.ipynb_checkpoints
 
 # IPython
-profile_default/
-ipython_config.py
 
 # pyenv
 #   For a library or package, you might want to ignore these files since the code is
@@ -209,6 +218,11 @@ cython_debug/
 # Poetry local configuration file - https://python-poetry.org/docs/configuration/#local-configuration
 poetry.toml
 
+# ruff
+.ruff_cache/
+
+# LSP config files
+pyrightconfig.json
 
 ### VisualStudioCode ###
 .vscode/*
@@ -255,4 +269,4 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode,macos,windows
+# End of https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks,visualstudiocode,macos,windows,obsidian
