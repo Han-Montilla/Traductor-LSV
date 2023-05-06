@@ -2,7 +2,17 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,jupyternotebooks,visualstudiocode,macos,windows,obsidian
 
 # Project Specific
+workspace/data/*
+!workspace/data/.gitkeep
 
+workspace/images/collected/*
+!workspace/images/collected/.gitkeep
+
+workspace/images/accepted/*
+!workspace/images/accepted/.gitkeep
+
+workspace/images/rejected/*
+!workspace/images/rejected/.gitkeep
 
 ### JupyterNotebooks ###
 # gitignore template for Jupyter Notebooks
