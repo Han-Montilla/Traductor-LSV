@@ -8,6 +8,9 @@ workspace/data/*
 workspace/images/collected/*
 !workspace/images/collected/.gitkeep
 
+workspace/models/*
+!workspace/models/.gitkeep
+
 workspace/images/accepted/*
 !workspace/images/accepted/.gitkeep
 
