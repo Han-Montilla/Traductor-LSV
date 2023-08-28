@@ -32,7 +32,7 @@ We used [MediaPipe](https://developers.google.com/mediapipe) to capture our hand
 10. Run `npm install` and `npm run dev` to test out the model!
 
 ---
-## **Traductor Online en tiempo real del Lenguaje de Señas Venezolano ![Venezuela Flag](./assets/ve.png)
+## **Traductor Online en tiempo real del Lenguaje de Señas Venezolano** ![Venezuela Flag](./assets/ve.png)
 
 ##### [¡Pruébalo!](https://traductor-lsv.web.app/)
 
